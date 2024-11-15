@@ -1,0 +1,10 @@
+server:
+  port: ":8080"
+database:
+  master: "postgres://postgres:d3v3l0p8015@34.143.164.15:5432/healthcare_intelligence"
+api:
+  auth: "https://staging-api.cfu.pharmalink.id/auth"
+swagger:
+  host: "localhost:8080"
+  schemes:
+    - http
