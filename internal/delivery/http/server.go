@@ -13,10 +13,15 @@ type SkeletonHandler interface {
 	GetSkeleton(w http.ResponseWriter, r *http.Request)
 }
 
+type UserHandler interface {
+	GetUser(w http.ResponseWriter, r *http.Request)
+}
+
 // Server ...
 type Server struct {
 	server   *http.Server
 	Skeleton SkeletonHandler
+	User     UserHandler
 }
 
 // Serve is serving HTTP gracefully on port x ...

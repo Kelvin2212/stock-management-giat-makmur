@@ -22,12 +22,19 @@ func (s *Server) Handler() *mux.Router {
 	r.HandleFunc("/", defaultHandler).Methods("GET")
 
 	// Tambahan Prefix di depan API endpoint
-	router := r.PathPrefix("/example").Subrouter()
+	router := r.PathPrefix("/stok").Subrouter()
 
 	// Routes
 	skeleton := router.PathPrefix("/skeleton").Subrouter()
+	user := router.PathPrefix("/user").Subrouter()
+
 	skeleton.Use(s.JWTMiddleware)
 	skeleton.HandleFunc("", s.Skeleton.GetSkeleton).Methods("GET")
+
+	user.Use(s.JWTMiddleware)
+	user.HandleFunc("/user", s.User.GetUser).Methods("GET")
+	// user.HandleFunc("", s.Skeleton.PostUser).Methods("POST")
+	// user.HandleFunc("", s.Skeleton.PutUser).Methods("PUT")
 
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 	return r

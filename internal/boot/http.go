@@ -10,15 +10,23 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/jmoiron/sqlx"
+
+	// "github.com/jackc/pgx/v5"
 	"github.com/spf13/viper"
 
 	authData "skeleton/internal/data/auth"
 	authService "skeleton/internal/service/auth"
 
 	skeletonData "skeleton/internal/data/skeleton"
+	userData "skeleton/internal/data/user"
+
 	skeletonServer "skeleton/internal/delivery/http"
+
 	skeletonHandler "skeleton/internal/delivery/http/skeleton"
+	userHandler "skeleton/internal/delivery/http/user"
+
 	skeletonService "skeleton/internal/service/skeleton"
+	userService "skeleton/internal/service/user"
 )
 
 // HTTP will load configuration, do dependency injection and then start the HTTP server
@@ -48,6 +56,10 @@ func HTTP() error {
 	ss := skeletonService.New(sd, as)
 	sh := skeletonHandler.New(ss)
 
+	ud := userData.New(db)
+	us := userService.New(ud, as)
+	uh := userHandler.New(us)
+
 	//watch config changes
 	config.PrepareWatchPath()
 	viper.OnConfigChange(func(e fsnotify.Event) {
@@ -70,11 +82,13 @@ func HTTP() error {
 			//re-init all Data Layer
 			//sd2.InitStmt()
 			sd.InitStmt()
+			ud.InitStmt()
 		}
 	})
 
 	s := skeletonServer.Server{
 		Skeleton: sh,
+		User: uh,
 	}
 
 	if err := s.Serve(cfg.Server.Port); err != http.ErrServerClosed {
